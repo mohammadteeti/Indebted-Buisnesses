@@ -59,23 +59,28 @@ def monitor_shop_input():
                 inputField.setAttribute('data-last-input', inputField.value.trim().toLowerCase());
             });
         """, input_field)
-
+        prev_input = "" 
         while True:
             # Check the input field's value
+            
             current_input = driver.execute_script("return arguments[0].getAttribute('data-last-input');", input_field)
-
-            if current_input and current_input in indebted_shops:
-                print(f"ALERT: '{current_input}' is an indebted shop!")
-                winsound.Beep(700, 1000)  # Trigger sound alert
-                time.sleep(5)  # Prevent duplicate alerts
-
+            print("current_input: " , current_input )
+            if prev_input == current_input:
+                continue
+            if current_input : 
+                if current_input.strip() in indebted_shops:
+                    print(f"ALERT: '{current_input}' is an indebted shop!")
+                    winsound.Beep(700, 1000)  # Trigger sound alert
+                    time.sleep(5)  # Prevent duplicate alerts
+                    prev_input=current_input
             # Short sleep to prevent high CPU usage
             time.sleep(0.5)
-            current_input="" # don't repeat the alarm
+
     except Exception as e:
         print(f"Error: {e}")
     finally:
         print("End")
+        winsound.Beep(1000, 500)
         driver.quit()
 
 if __name__ == "__main__":
