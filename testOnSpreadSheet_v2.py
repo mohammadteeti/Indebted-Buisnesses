@@ -23,10 +23,28 @@ def load_indebted_shops_from_sheet(sheet_url):
 
     # Open the Google Sheet
     sheet = client.open_by_url(sheet_url)
-    worksheet = sheet.get_worksheet(0)  # Assuming data is in the first sheet
+
+    #sheet_number : int= int(input("Enter Sheet Number:"))
+    #worksheet = sheet.get_worksheet(sheet_number)  # get worksheet by it's index (index start from 0 for the first sheet)
+
+    sheet_name = input("Enter Sheet Name: ")
+    worksheet=sheet.worksheet(sheet_name)
 
     # Extract data from the 'Business Name' column (Column A)
-    shop_names = worksheet.col_values(1)  # Column A is indexed as 1
+    shop_names = []
+
+    # Loop over rows, starting from index 1 to second-to-last row in column D
+    size=len(worksheet.col_values(4))
+    status=worksheet.col_values(4)
+    all_shops=worksheet.col_values(1)
+
+    for k in range(1, size- 2):
+        print(status[k])  # Print the value in column D
+        if str(status[k]) == "جاهز":
+            shop_names.append(all_shops[k])  # Append the corresponding value from column A
+
+
+
 
     # Convert all shop names to lowercase and strip spaces
     shop_names = [str(name).strip().lower() for name in shop_names if name]
@@ -44,7 +62,17 @@ def monitor_shop_input():
     # Setup the Selenium WebDriver (ensure chromedriver is in PATH)
     driver = webdriver.Chrome(options=options)  # You can use other browsers like Firefox or Edge
     driver.get("https://opost.ps/resources/invoices/create")  # Replace with your actual website URL
-    print([i for i in indebted_shops],"\n")
+    print("\n".join(str(i) for i in indebted_shops))
+
+    print (f"Number of indepted business = {len(indebted_shops)}")
+
+    with open("indebted_shops.txt","w") as file :
+        j=1
+        for i in indebted_shops: 
+            file.write(f"{j}-{i}\n")
+            j=j+1
+
+
     try:
         # Wait for the input field to be loaded
         wait = WebDriverWait(driver, 10)
@@ -64,7 +92,7 @@ def monitor_shop_input():
             # Check the input field's value
             
             current_input = driver.execute_script("return arguments[0].getAttribute('data-last-input');", input_field)
-            print("current_input: " , current_input )
+            #print("current_input: " , current_input )
             if prev_input == current_input:
                 continue
             if current_input : 
