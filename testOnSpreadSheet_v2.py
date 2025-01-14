@@ -38,9 +38,9 @@ def load_indebted_shops_from_sheet(sheet_url):
     status=worksheet.col_values(4)
     all_shops=worksheet.col_values(1)
 
+    # Extract the names corrosponding to the status = "جاري المتابعة"
     for k in range(1, size- 2):
-        print(status[k])  # Print the value in column D
-        if str(status[k]) == "جاهز":
+        if str(status[k]).strip() == str("جاري المتابعة"):
             shop_names.append(all_shops[k])  # Append the corresponding value from column A
 
 
@@ -62,15 +62,16 @@ def monitor_shop_input():
     # Setup the Selenium WebDriver (ensure chromedriver is in PATH)
     driver = webdriver.Chrome(options=options)  # You can use other browsers like Firefox or Edge
     driver.get("https://opost.ps/resources/invoices/create")  # Replace with your actual website URL
-    print("\n".join(str(i) for i in indebted_shops))
+    
+    #print("\n".join(str(i) for i in indebted_shops))
 
     print (f"Number of indepted business = {len(indebted_shops)}")
 
-    with open("indebted_shops.txt","w") as file :
-        j=1
-        for i in indebted_shops: 
-            file.write(f"{j}-{i}\n")
-            j=j+1
+   # with open("indebted_shops.txt","w") as file :
+   #     j=1
+  #      for i in indebted_shops: 
+ #           file.write(f"{j}-{i}\n")
+#            j=j+1
 
 
     try:
