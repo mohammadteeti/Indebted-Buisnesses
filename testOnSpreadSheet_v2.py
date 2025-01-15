@@ -9,7 +9,16 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 import winsound
 from oauth2client.service_account import ServiceAccountCredentials
+import os
 
+debugging_mode_string= ""
+url=""
+
+def start_chrome_session():
+    cmd = "chrome.exe --remote-debugging-port=9222 --user-data-dir=\\'C:\\selenium\\' "
+    os.system(cmd)
+    
+    
 # Google Sheets setup
 def load_indebted_shops_from_sheet(sheet_url):
     # Define the scope
@@ -113,4 +122,6 @@ def monitor_shop_input():
         driver.quit()
 
 if __name__ == "__main__":
+    #start_chrome_session()
+
     monitor_shop_input()
