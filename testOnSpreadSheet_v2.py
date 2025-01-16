@@ -13,9 +13,10 @@ import os
 
 debugging_mode_string= ""
 url=""
+shop_status=""
 
 def start_chrome_session():
-    cmd = "chrome.exe --remote-debugging-port=9222 --user-data-dir=\\'C:\\selenium\\' "
+    cmd =  debugging_mode_string #"chrome.exe --remote-debugging-port=9222 --user-data-dir=\\'C:\\selenium\\' "
     os.system(cmd)
     
     
@@ -49,7 +50,7 @@ def load_indebted_shops_from_sheet(sheet_url):
 
     # Extract the names corrosponding to the status = "جاري المتابعة"
     for k in range(1, size- 2):
-        if str(status[k]).strip() == str("جاري المتابعة"):
+        if str(status[k]).strip() == str(shop_status)+" ":
             shop_names.append(all_shops[k])  # Append the corresponding value from column A
 
 
@@ -62,7 +63,8 @@ def load_indebted_shops_from_sheet(sheet_url):
 # Main function to monitor the list input
 def monitor_shop_input():
     # Load the indebted shops from Google Sheet
-    SHEET_URL = "https://docs.google.com/spreadsheets/d/13EOKkBNrfFFOQBoJF8UxVMCszQVpyntcBL0zNqBWPPc/edit?gid=1956153930#gid=1956153930"
+    SHEET_URL = url #"https://docs.google.com/spreadsheets/d/13EOKkBNrfFFOQBoJF8UxVMCszQVpyntcBL0zNqBWPPc/edit?gid=1956153930#gid=1956153930"
+    print("URL:   ", url)
     indebted_shops = load_indebted_shops_from_sheet(SHEET_URL)
 
     # Connect to an existing Chrome session using the remote debugging port
@@ -123,5 +125,26 @@ def monitor_shop_input():
 
 if __name__ == "__main__":
     #start_chrome_session()
+    with  open("config.cfg","r") as cfg:
+        debugging_mode_string=  cfg.readline() .split(",")[1]
+        url=cfg.readline().split(",")[1]
+        shop_status=cfg.readline().split(",") #a compuund bug poped up here due to different Encoding system used when retrieving arabic characters 
+                                              # the "جاري المتابعة" status was read encrypted from the cfg file 
+                                              # a convenient way to solve the issue might be by saving Cfg file in ANSI encodign or change the font type of
+                                              # of "جاري المتابعة" status into a type  support by UTF-8
+        print(url)
+        print(str(shop_status[0]))
+    cfg.close()
+
+    print("starting chrome session ...")
+    start_chrome_session()
+
+    print("please login to opost acount !")
+
+    ready = "n"
+
+    while(not(ready.lower()=="y")):
+        ready=input ("READY? Y / N ")
+        time.sleep(5)
 
     monitor_shop_input()
