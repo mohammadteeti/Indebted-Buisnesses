@@ -1,0 +1,3 @@
+debugging_mode_string,msedge.exe --remote-debugging-port=9222 --user-data-dir="C:\selenium" --no-first-run --no-default-browser-check --profile-directory="Default"
+url,https://docs.google.com/spreadsheets/d/13EOKkBNrfFFOQBoJF8UxVMCszQVpyntcBL0zNqBWPPc/edit?gid=1956153930#gid=1956153930
+shop_status,جاري المتابعة
