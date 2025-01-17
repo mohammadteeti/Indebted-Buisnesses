@@ -15,6 +15,9 @@ debugging_mode_string = ""
 url = ""
 shop_status = ""
 
+
+
+
 def start_edge_session():
     cmd = debugging_mode_string
     os.system(cmd)
@@ -37,7 +40,7 @@ def load_indebted_shops_from_sheet(sheet_url):
     all_shops = worksheet.col_values(1)
 
     for k in range(1, size - 2):
-        if str(status[k]).strip() == str(shop_status) + " ":
+        if str(status[k]).strip() == str(shop_status) :
             shop_names.append(all_shops[k])
 
     shop_names = [str(name).strip().lower() for name in shop_names if name]
@@ -93,7 +96,7 @@ def monitor_shop_input():
         driver.quit()
 
 if __name__ == "__main__":
-    with open("config_Edge_version.cfg", "r") as cfg:
+    with open("config_Edge_version.txt", "r",encoding="utf-8") as cfg:
         
         debugging_mode_string = cfg.readline().split(',')[1]
         url = cfg.readline().split(',')[1]
