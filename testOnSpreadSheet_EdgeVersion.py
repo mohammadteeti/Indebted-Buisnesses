@@ -40,7 +40,8 @@ def load_indebted_shops_from_sheet(sheet_url):
     all_shops = worksheet.col_values(1)
 
     for k in range(1, size - 2):
-        if str(status[k]).strip() == str(shop_status) :
+        print (status[k])
+        if str(status[k]).strip()==shop_status:
             shop_names.append(all_shops[k])
 
     shop_names = [str(name).strip().lower() for name in shop_names if name]
