@@ -1,3 +1,4 @@
+import subprocess
 import time
 import pandas as pd
 import gspread
@@ -10,14 +11,29 @@ from selenium.webdriver.common.keys import Keys
 import winsound
 from oauth2client.service_account import ServiceAccountCredentials
 import os
-
+import psutil
 debugging_mode_string= ""
 url=""
 shop_status=""
 
 def start_chrome_session():
-    cmd =  debugging_mode_string #"chrome.exe --remote-debugging-port=9222 --user-data-dir=\\'C:\\selenium\\' "
-    os.system(cmd)
+    chrome_path = "C:\\Program Files\\Google\\Chrome\\Application"
+    os.environ["PATH"] = os.pathsep + chrome_path
+    time.sleep(0.5)
+    
+    # Ensure the debugging command is properly defined
+    cmd = debugging_mode_string  # Example: "chrome.exe --remote-debugging-port=9222 --user-data-dir='C:\\selenium\\'"
+    
+    if not cmd:
+        print("Debugging mode command is empty. Check the configuration.")
+        return
+
+    try:
+        # Use subprocess.Popen to start Chrome in the background
+        process = subprocess.Popen(cmd, shell=True)
+        print(f"Chrome session started with PID: {process.pid}")
+    except Exception as e:
+        print(f"Error starting Chrome session: {e}")
     
     
 # Google Sheets setup
@@ -50,7 +66,7 @@ def load_indebted_shops_from_sheet(sheet_url):
 
     # Extract the names corrosponding to the status = "جاري المتابعة"
     for k in range(1, size- 2):
-        if str(status[k]).strip() == str(shop_status)+" ":
+        if str(status[k]).strip() == str(shop_status):
             shop_names.append(all_shops[k])  # Append the corresponding value from column A
 
 
@@ -122,18 +138,43 @@ def monitor_shop_input():
         print("End")
         winsound.Beep(1000, 500)
         driver.quit()
+        kill_processes_on_port(9222)
+
+
+def kill_processes_on_port(port):
+    """
+    Kill all processes using the specified port.
+    """
+    try:
+        for conn in psutil.net_connections(kind="inet"):
+            if conn.laddr.port == port:
+                pid = conn.pid
+                if pid:  # Ensure the connection is associated with a process
+                    try:
+                        proc = psutil.Process(pid)
+                        proc.terminate()  # Graceful termination
+                        proc.wait(timeout=3)  # Wait for the process to exit
+                        print(f"Terminated process {pid} using port {port}.")
+                    except psutil.NoSuchProcess:
+                        print(f"Process {pid} does not exist.")
+                    except psutil.AccessDenied:
+                        print(f"Access denied when trying to terminate process {pid}.")
+                    except psutil.TimeoutExpired:
+                        proc.kill()  # Force kill if process doesn't terminate
+                        print(f"Force-killed process {pid} using port {port}.")
+    except Exception as e:
+        print(f"An error occurred while killing processes on port {port}: {e}")
 
 if __name__ == "__main__":
     #start_chrome_session()
-    with  open("config.cfg","r") as cfg:
-        debugging_mode_string=  cfg.readline() .split(",")[1]
-        url=cfg.readline().split(",")[1]
-        shop_status=cfg.readline().split(",") #a compuund bug poped up here due to different Encoding system used when retrieving arabic characters 
-                                              # the "جاري المتابعة" status was read encrypted from the cfg file 
-                                              # a convenient way to solve the issue might be by saving Cfg file in ANSI encodign or change the font type of
-                                              # of "جاري المتابعة" status into a type  support by UTF-8
+    with open("config.cfg", "r",encoding="utf-8") as cfg:
+        
+        debugging_mode_string = cfg.readline().split(',')[1]
+        url = cfg.readline().split(',')[1]
+        shop_status = cfg.readline().split(',')[1]
+        print(debugging_mode_string)
         print(url)
-        print(str(shop_status[0]))
+        print(str(shop_status))
     cfg.close()
 
     print("starting chrome session ...")

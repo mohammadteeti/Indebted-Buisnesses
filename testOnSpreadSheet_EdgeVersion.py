@@ -1,3 +1,4 @@
+import subprocess
 import time
 import pandas as pd
 import gspread
@@ -10,7 +11,7 @@ from selenium.webdriver.common.keys import Keys
 import winsound
 from oauth2client.service_account import ServiceAccountCredentials
 import os
-
+import psutil
 debugging_mode_string = ""
 url = ""
 shop_status = ""
@@ -19,8 +20,23 @@ shop_status = ""
 
 
 def start_edge_session():
-    cmd = debugging_mode_string
-    os.system(cmd)
+    edge_path="c:\\program files (x86)\\Microsoft\\Edge\\Application"
+
+    os.environ["PATH"]+=os.pathsep + edge_path
+    time.sleep(0.5)
+    # Ensure the debugging command is properly defined
+    cmd = debugging_mode_string  # Example: "chrome.exe --remote-debugging-port=9222 --user-data-dir='C:\\selenium\\'"
+    
+    if not cmd:
+        print("Debugging mode command is empty. Check the configuration.")
+        return
+
+    try:
+        # Use subprocess.Popen to start Chrome in the background
+        process = subprocess.Popen(cmd, shell=True)
+        print(f"Chrome session started with PID: {process.pid}")
+    except Exception as e:
+        print(f"Error starting Chrome session: {e}")
 
 # Google Sheets setup
 def load_indebted_shops_from_sheet(sheet_url):
@@ -95,6 +111,33 @@ def monitor_shop_input():
         time.sleep(0.5)
         winsound.Beep(1000, 400)
         driver.quit()
+        kill_processes_on_port(9222)
+
+
+
+def kill_processes_on_port(port):
+    """
+    Kill all processes using the specified port.
+    """
+    try:
+        for conn in psutil.net_connections(kind="inet"):
+            if conn.laddr.port == port:
+                pid = conn.pid
+                if pid:  # Ensure the connection is associated with a process
+                    try:
+                        proc = psutil.Process(pid)
+                        proc.terminate()  # Graceful termination
+                        proc.wait(timeout=3)  # Wait for the process to exit
+                        print(f"Terminated process {pid} using port {port}.")
+                    except psutil.NoSuchProcess:
+                        print(f"Process {pid} does not exist.")
+                    except psutil.AccessDenied:
+                        print(f"Access denied when trying to terminate process {pid}.")
+                    except psutil.TimeoutExpired:
+                        proc.kill()  # Force kill if process doesn't terminate
+                        print(f"Force-killed process {pid} using port {port}.")
+    except Exception as e:
+        print(f"An error occurred while killing processes on port {port}: {e}")
 
 if __name__ == "__main__":
     with open("config_Edge_version.txt", "r",encoding="utf-8") as cfg:
@@ -102,7 +145,7 @@ if __name__ == "__main__":
         debugging_mode_string = cfg.readline().split(',')[1]
         url = cfg.readline().split(',')[1]
         shop_status = cfg.readline().split(',')[1]
-        print("debugging_mode_string",debugging_mode_string)
+        print(debugging_mode_string)
         print(url)
         print(str(shop_status))
     cfg.close()
