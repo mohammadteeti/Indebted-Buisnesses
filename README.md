@@ -23,3 +23,13 @@ __Chrome__ and __Edge__ controls
 
 *the code starts a separate browser session in debugging mode on port 9222 by calling* `def start_chrome_session():` *or* `def start_edge_session():`
 
+### API and Connection 
+
+*the code utilizes service account authentication to access google spreadsheet on the Google API Project, SpreadSheet API is enabled*
+*a __credential.json__ file is used for authentication*
+
+*the spread sheet on which the operation would be applied must be shared using the Project API Allowed Users (The Granted Email on service account api)*
+
+
+
+
