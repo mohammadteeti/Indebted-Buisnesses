@@ -1,0 +1,12 @@
+1-Fixing the arabic encodign bug by using UTF-8 in config.cfg file 
+
+2-create kill_process function to kill the process on port 9222 after quiting driver
+
+3.fix the bug of suspension after "starting chrome session" line and after "starting edge session" line
+
+the susspension was due to start_session functions weren't able to launch a new chrome.exe and msedge.exe proceses
+
+so we fixed the bug by creating a subprocess (modifying the start_session functions)
+
+4.The first beta release to be published as exe program for windwos
+

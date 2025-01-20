@@ -12,6 +12,7 @@ import winsound
 from oauth2client.service_account import ServiceAccountCredentials
 import os
 import psutil
+import pygame
 debugging_mode_string= ""
 url=""
 shop_status=""
@@ -126,6 +127,7 @@ def monitor_shop_input():
             if current_input : 
                 if current_input.strip() in indebted_shops:
                     print(f"ALERT: '{current_input}' is an indebted shop!")
+                    error_beep.play()
                     winsound.Beep(700, 1000)  # Trigger sound alert
                     time.sleep(5)  # Prevent duplicate alerts
                     prev_input=current_input
@@ -166,6 +168,8 @@ def kill_processes_on_port(port):
         print(f"An error occurred while killing processes on port {port}: {e}")
 
 if __name__ == "__main__":
+    pygame.mixer.init()
+    error_beep=  pygame.mixer.Sound("error.wav")
     #start_chrome_session()
     with open("config.cfg", "r",encoding="utf-8") as cfg:
         
