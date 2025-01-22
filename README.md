@@ -45,7 +45,7 @@ the driver instance reads the input field specified in <br/>
             });
         """, input_field)
 ```
-For each input inserted by the user a checking flow is invoked if the name is in the sho_name list a beep sound notifies the user 
+For each input inserted by the user a checking flow is invoked if the name is in the shop_name list a beep sound notifies the user 
 
 
 ### Quitting 
